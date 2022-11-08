@@ -10,7 +10,6 @@ on:
     - cron:  '*/10 * * * *' # Run every 10 minutes.
 
 jobs:
-
   sync-workflows:
     name: Sync GitHub Actions workflows
     runs-on: ubuntu-latest
@@ -18,11 +17,15 @@ jobs:
       - name: Sync files
         uses: adrianjost/files-sync-action@v1.5.1
         with:
-          FILE_PATTERNS: |
-            ^.github/workflows/linting.yml
-            ^.github/workflows/cleanup-workflows.yml
-          TARGET_REPOS: |
+          FILE_PATTERNS: |-
+            ^linting\.yml$
+            ^cleanup-workflows\.yml$
+          SRC_ROOT: /.github/workflows/
+          TARGET_ROOT: /.github/workflows/
+          TARGET_REPOS: |-
            vladdoster/dotfiles
            vladdoster/neovim-configuration
            vladdoster/hammerspoon-configuration
+          GIT_EMAIL: mvdoster@gmail.com
+          GITHUB_USERNAME: vladdoster
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
