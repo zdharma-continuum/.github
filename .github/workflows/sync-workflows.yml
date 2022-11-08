@@ -18,7 +18,7 @@ jobs:
         uses: adrianjost/files-sync-action@v1.5.1
         with:
           SKIP_DELETE: true
-          COMMIT_MESSAGE: maint: update synced GitHub automation workflows
+          COMMIT_MESSAGE: 'maint: update synced GitHub automation workflows'
           FILE_PATTERNS: |-
             ^linting\.yml$
             ^cleanup-workflows\.yml$
