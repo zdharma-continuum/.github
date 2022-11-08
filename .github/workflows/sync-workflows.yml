@@ -20,8 +20,9 @@ jobs:
           SKIP_DELETE: true
           COMMIT_MESSAGE: 'maint: update synced GitHub automation workflows'
           FILE_PATTERNS: |-
-            ^linting\.yml$
-            ^cleanup-workflows\.yml$
+            ^linting.yml$
+            ^cleanup-runs.yml$
+            ^release.yml$
           SRC_ROOT: /.github/workflows/
           TARGET_ROOT: /.github/workflows/
           TARGET_REPOS: |-
