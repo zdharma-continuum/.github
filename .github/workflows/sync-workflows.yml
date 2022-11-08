@@ -25,4 +25,4 @@ jobs:
            vladdoster/dotfiles
            vladdoster/neovim-configuration
            vladdoster/hammerspoon-configuration
-          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
