@@ -28,4 +28,4 @@ jobs:
            vladdoster/hammerspoon-configuration
           GIT_EMAIL: mvdoster@gmail.com
           GIT_USERNAME: vladdoster
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
