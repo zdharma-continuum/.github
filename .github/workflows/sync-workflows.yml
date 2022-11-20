@@ -17,7 +17,7 @@ jobs:
       - name: Sync files
         uses: adrianjost/files-sync-action@v1.5.1
         with:
-          COMMIT_MESSAGE: 'maint: update synced GitHub automation workflows'
+          COMMIT_MESSAGE: 'ci: update synced github action workflows'
           FILE_PATTERNS: |-
             ^linting.yml$
             ^cleanup-runs.yml$
