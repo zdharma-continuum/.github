@@ -7,7 +7,7 @@ on:
       - main
       - master
   schedule:
-    - cron:  '*/10 * * * *' # Run every 10 minutes.
+    - cron: '*/10 * * * *'
 
 jobs:
   sync-workflows:
@@ -28,6 +28,7 @@ jobs:
            vladdoster/dotfiles
            vladdoster/neovim-configuration
            vladdoster/hammerspoon-configuration
+           vladdoster/remember.nvim
           GIT_EMAIL: mvdoster@gmail.com
           GIT_USERNAME: vladdoster
           GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
