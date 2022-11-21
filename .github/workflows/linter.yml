@@ -22,17 +22,17 @@ jobs:
           brew install shellcheck shfmt zsh
           pip3 install --user linkify-it-py mdformat mdformat-config mdformat-gfm mdformat-shfmt mdformat-tables mdformat-toc
 
-      - name: run mdformat
-        run: find . -name '*.md' -type f -print0 | xargs -0 -n1 -P4 python3 -m mdformat --check --wrap 120
+      - name: markdown lint
+        run: find . -name '*.md' ! -name 'CHANGELOG.md' -name '*.md' -type f -print0 | xargs -0 -n1 -P4 mdformat --check --wrap 120
 
-      - name: run shfmt
+      - name: shell format lint
         run: find . -name '*.sh' -type f -print0 | xargs -0 -n1 -P4 shfmt -bn -ci -d -i 2 -ln bash -s -sr
 
-      - name: run shellcheck
+      - name: shell logic lint
         run: find . -name '*.sh' -type f -print0 | xargs -0 -n1 -P4 shellcheck
 
-      - name: "run zsh"
+      - name: zsh syntax lint
         run: find . -name '*.zsh' -type f -print0 | xargs -0 -n1 -P4 zsh -n
 
-      - name: "run zcompile"
+      - name: zsh compile lint
         run: find . -name '*.zsh' -type f -exec zsh -fc "zcompile {}" \;
