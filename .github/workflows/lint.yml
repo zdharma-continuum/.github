@@ -21,7 +21,7 @@ jobs:
       - name: install dependencies
         run: |
           brew install shellcheck shfmt zsh
-          pip install --user linkify-it-py mdformat mdformat-config mdformat-gfm mdformat-shfmt mdformat-tables mdformat-toc
+          pip3 install --user linkify-it-py mdformat mdformat-config mdformat-gfm mdformat-shfmt mdformat-tables mdformat-toc
 
       - name: commit
         uses: wagoid/commitlint-github-action@v5
