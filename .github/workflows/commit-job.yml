@@ -1,0 +1,26 @@
+name: Commit Lint
+
+on:
+  pull_request:
+    branches: [main,master]
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Create commit-lint configuration
+        run: |
+          cat <<EOF > .commitlintrc
+          {
+          "extends": "@commitlint/config-angular"
+          }          
+          EOF
+      # run: wget https://raw.githubusercontent.com/zdharma-continuum/.github/master/.commitlintrc
+      - uses: wagoid/commitlint-github-action@v5
+        with:
+          configFile: '.commitlintrc'
