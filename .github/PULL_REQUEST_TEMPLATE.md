@@ -1,29 +1,28 @@
+## Description
 
-<!--- Provide a general summary of your changes in the Title above -->
+## Related Issue(s)
 
-## Description <!--- Describe your changes in detail -->
+<!--- If it fixes an open issue, add a link the issue -->
 
-## Motivation and Context <!--- Why is this change required? What problem does it solve? -->
+## Motivation and Context <!--- What problem does it solve? -->
 
-## Related Issue(s) <!--- If it fixes an open issue, please link to the issue here. -->
-
-## Usage examples <!--- Provide examples of intended usage -->
+## Usage examples
 
 ```zsh
 
 ```
 
-## How Has This Been Tested? <!--- Please describe in detail how you tested your changes. -->
+## How Has This Been Tested?
 
-## Types of changes <!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
+## Types of changes <!--- Put an `x` in all the boxes that apply. -->
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to change)
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] Documentation change
+- [ ] New feature (non-breaking change which adds functionality)
 
-## Checklist: <!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
+## Checklist: <!--- Add an `x` in all the boxes that apply. -->
 
-- [ ] My change requires a change to the documentation.
-- [ ] I have updated the documentation accordingly.
-- [ ] I have added tests to cover my changes.
 - [ ] All new and existing tests passed.
+- [ ] I have added tests to cover my changes.
+- [ ] I have updated the documentation accordingly.
