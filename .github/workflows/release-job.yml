@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  workflow_call:
+    secrets:
+      github-token:
+        description: 'GH token passed from the caller workflow'
+        required: true     
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: 
+      name: develop
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Fetch dependencies
+        run: npm install --no-package-lock @semantic-release/{'changelog','git','exec'} @google/semantic-release-replace-plugin
+      - name: Fetch semantic-release configuration
+        run: wget https://raw.githubusercontent.com/zdharma-continuum/.github/main/.releaserc.json
+      - name: Generate release
+        run: npx semantic-release --ci --
+        env:
+          GITHUB_TOKEN: ${{ secrets.github-token }}
+          GIT_AUTHOR_EMAIL: 'mvdoster@gmail.com'
+          GIT_AUTHOR_NAME: 'Vladislav Doster'
+          GIT_COMMITTER_EMAIL: 'mvdoster@gmail.com'
+          GIT_COMMITTER_NAME: 'Vladislav Doster'
