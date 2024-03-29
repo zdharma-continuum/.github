@@ -21,6 +21,6 @@ jobs:
           }          
           EOF
       # run: wget https://raw.githubusercontent.com/zdharma-continuum/.github/master/.commitlintrc
-      - uses: wagoid/commitlint-github-action@v5
+      - uses: wagoid/commitlint-github-action@v6
         with:
           configFile: '.commitlintrc'
