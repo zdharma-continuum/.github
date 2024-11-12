@@ -22,7 +22,7 @@ jobs:
       - name: install dependencies
         run: |
           brew install shellcheck shfmt zsh
-          python3 -m pip install --user linkify-it-py mdformat mdformat-config mdformat-gfm mdformat-shfmt mdformat-tables mdformat-toc
+          python3 -m pip install --break-system-packages --user linkify-it-py mdformat mdformat-config mdformat-gfm mdformat-shfmt mdformat-tables mdformat-toc
 
       - name: run mdformat
         run: find . -name '*.md' ! -name 'CHANGELOG.md' -type f -print0 | xargs -0 -n1 -P4 python3 -m mdformat --check --wrap 120
