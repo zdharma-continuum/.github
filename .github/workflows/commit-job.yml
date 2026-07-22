@@ -2,7 +2,7 @@ name: Commit Lint
 
 on:
   pull_request:
-    branches: [main,master]
+    branches: [main, master]
   workflow_call:
   workflow_dispatch:
 
@@ -12,16 +12,50 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          fetch-depth: '0'
+          fetch-depth: "0"
+      - uses: actions/setup-node@v7
       - name: Create commit-lint configuration
         run: |
-          cat <<EOF > .commitlintrc
+          COMMITLINT_RC="${RUNNER_TEMP}/commitlintrc"
+          cat > "${COMMITLINT_RC}" <<'EOF'
           {
-          "extends": "@commitlint/config-conventional"
-          }          
+            "parserPreset": {
+              "name": "conventional-changelog-conventionalcommits",
+              "presetConfig": {
+                "types": [
+                  {"type": "feat", "section": "Features"},
+                  {"type": "fix", "section": "Bug Fixes"},
+                  {"type": "perf", "section": "Performance"},
+                  {"type": "refactor", "section": "Refactor"},
+                  {"type": "docs", "section": "Documentation", "hidden": "false"}
+                ]
+              }
+            },
+            "rules": {
+              "header-case": [2, "always", ["lower-case","sentence-case"]],
+              "header-max-length": [2, "always", 80],
+              "subject-case": [2, "always", ["lower-case"]],
+              "type-case": [2, "always", ["lower-case"]],
+              "type-empty": [2, "never"],
+              "type-enum": [2, "always", ["build", "chore", "ci", "docs", "feat", "fix", "perf", "refactor", "revert", "style", "test"]],
+            }
+          }
           EOF
-      # run: wget https://raw.githubusercontent.com/zdharma-continuum/.github/master/.commitlintrc
-      - uses: wagoid/commitlint-github-action@v6
-        with:
-          configFile: '.commitlintrc'
+          echo "COMMITLINT_CONFIG=${COMMITLINT_RC}" >> "${GITHUB_ENV}"
 
+      - name: Validate current commit (last commit) with commitlint
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          npx commitlint \
+            --config=${COMMITLINT_CONFIG} \
+            --last \
+            --verbose
+
+      - name: Validate PR commits with commitlint
+        if: github.event_name == 'pull_request'
+        run: |
+          npx commitlint \
+            --config=${COMMITLINT_CONFIG} \
+            --from='${{github.event.pull_request.base.sha}}' \
+            --to='${{github.event.pull_request.head.sha}}' \
+            --verbose
