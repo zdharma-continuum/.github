@@ -18,7 +18,7 @@ jobs:
           cat > "${RUNNER_TEMP}/commitlintrc" <<'EOF'
           {
             "rules": {
-              "header-case": [2, "always", ["lower-case", "sentence-case", "start-case"]],
+              "header-case": [2, "always", ["sentence-case", "start-case", "pascal-case", "lower-case"]],
               "header-max-length": [2, "always", 80],
               "subject-case": [2, "always", ["lower-case", "sentence-case", "start-case"]],
               "type-case": [2, "always", ["lower-case"]],
