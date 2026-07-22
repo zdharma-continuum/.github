@@ -17,10 +17,11 @@ jobs:
         run: |
           cat <<EOF > .commitlintrc
           {
-          "extends": "@commitlint/config-angular"
+          "extends": "@commitlint/config-conventional"
           }          
           EOF
       # run: wget https://raw.githubusercontent.com/zdharma-continuum/.github/master/.commitlintrc
       - uses: wagoid/commitlint-github-action@v6
         with:
           configFile: '.commitlintrc'
+
