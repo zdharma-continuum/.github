@@ -1,21 +1,38 @@
-name: Commit Lint
+name: PR Commit & Title Linter
 
 on:
   pull_request:
-    branches: [main, master]
+    types:
+      - edited
+      - opened
+      - synchronize
   workflow_call:
   workflow_dispatch:
 
 jobs:
-  commit:
-    runs-on: ubuntu-latest
+  commitlint:
+    runs-on: ubuntu-slim
+
+    if: |
+      github.actor != 'dependabot[bot]' &&
+      github.actor != 'renovate[bot]' &&
+      github.actor != 'github-actions[bot]'
+
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out code
+        uses: actions/checkout@v4
         with:
-          fetch-depth: "0"
-      - name: Create commit-lint configuration
+          fetch-depth: 0
+
+      - name: Fetch base branch history
+        run: git fetch origin ${{ github.event.pull_request.base.ref }} --depth 1
+
+      - name: Install commitlint
+        run: npm install commitlint
+
+      - name: Write custom commitlint config
         run: |
-          cat > "${RUNNER_TEMP}/commitlintrc" <<'EOF'
+          cat << 'EOF' > .commitlintrc.json
           {
             "rules": {
               "header-max-length": [2, "always", 80],
@@ -27,11 +44,86 @@ jobs:
           }
           EOF
 
-      - name: Validate commits with commitlint
-        env:
-          COMMITLINT_ARGS: ${{ github.event.pull_request && format('--from={0} --to={1}', github.event.pull_request.base.sha, github.event.pull_request.head.sha) || '--last' }}
+      - name: Validate Pull Request Title
+        id: lint_title
+        if: always()
         run: |
-          npx --yes commitlint@19 \
-            --config="${RUNNER_TEMP}/commitlintrc" \
-            ${COMMITLINT_ARGS} \
-            --verbose
+          set +e
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          TITLE_OUTPUT=$(echo "$PR_TITLE" | commitlint --color=false)
+          STATUS=$?
+          set -e
+
+          if [ $STATUS -ne 0 ]; then
+            CLEAN_TITLE_ERRORS=$(echo "$TITLE_OUTPUT" | grep '✖' | sed 's/✖//g' | tr '\n' ' ')
+            echo "::error title=Invalid PR Title Format::$CLEAN_TITLE_ERRORS"
+
+            echo "### Pull Request Title Failure" >> ./lint_errors.md
+            echo "Current Title: \`$PR_TITLE\`" >> ./lint_errors.md
+            echo "" >> ./lint_errors.md
+            echo "\`\`\`text" >> ./lint_errors.md
+            echo "$TITLE_OUTPUT" >> ./lint_errors.md
+            echo "\`\`\`" >> ./lint_errors.md
+            exit 1
+          fi
+
+      - name: Validate PR Commit History
+        id: lint_commits
+        if: always()
+        run: |
+          set +e
+          COMMIT_OUTPUT=$(commitlint --from=origin/${{ github.event.pull_request.base.ref }} --to=${{ github.event.pull_request.head.sha }} --color=false --verbose)
+          STATUS=$?
+          set -e
+
+          if [ $STATUS -ne 0 ]; then
+            echo "::error title=Invalid Commit Message Found::One or more commits inside this branch fail conventional guidelines."
+
+            echo "### Commit History Failure" >> ./lint_errors.md
+            echo "\`\`\`text" >> ./lint_errors.md
+            echo "$COMMIT_OUTPUT" >> ./lint_errors.md
+            echo "\`\`\`" >> ./lint_errors.md
+            exit 1
+          fi
+
+      - name: Post PR Checklist Comment
+        if: failure() && (steps.lint_title.outcome == 'failure' || steps.lint_commits.outcome == 'failure')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ERROR_BLOCK=$(cat ./lint_errors.md)
+
+          COMMENT_BODY=$(cat << EOF
+          ## Repository Formatting Guidelines Violation
+
+          Your pull request validation failed due to structural issues in your PR title or git commit history. Verify the diagnostics below:
+
+          $ERROR_BLOCK
+
+          ---
+
+          ### Conventional Specification Checklist
+          - Prefix Type Required: Must start with a designated lowercase token ("build", "chore", "ci", "docs", "feat", "fix", "perf", "refactor", "revert", "style", "test").
+          - Structural Casing Constraint: The text directly trailing your prefix token must evaluate cleanly as lower-case, sentence-case, or start-case.
+          - Character Boundary Restriction: Total horizontal title length cannot exceed 80 characters max.
+
+          ### Remediation Guide
+
+          How to rewrite your Pull Request Title:
+          Click the Edit button next to your PR title at the top of this dashboard page and apply standard structures:
+          > feat: add integration layer for authentication processing
+
+          How to fix a broken commit message on your local machine:
+          \`\`\`bash
+          git commit --amend --message="<prefix>: <message>"
+          git push origin HEAD --force-with-lease
+          \`\`\`
+          EOF
+          )
+
+          curl --silent \
+            --request POST \
+            --header "Authorization: token $GITHUB_TOKEN" \
+            --header "Accept: application/vnd.github.v3+json" \
+            "https://github.com{{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            --data "$(jq --null-input --arg body "$COMMENT_BODY" '{body: $body}')"
