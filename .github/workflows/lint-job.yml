@@ -2,30 +2,24 @@ name: Lint
 
 on:
   pull_request:
-    branches: [main,master]
+    branches: [main, master]
   push:
-    branches: [main,master]
+    branches: [main, master]
   workflow_call:
   workflow_dispatch:
 
 jobs:
-
   lint:
     name: Lint
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: '0'
-      - uses: actions/setup-python@v7
 
       - name: install dependencies
-        run: |
-          brew install shellcheck shfmt zsh
-          python3 -m pip install --break-system-packages --user linkify-it-py mdformat mdformat-config mdformat-gfm mdformat-shfmt mdformat-tables mdformat-toc
+        run: brew install shellcheck shfmt zsh uv
 
       - name: run mdformat
-        run: find . -name '*.md' ! -name 'CHANGELOG.md' -type f -print0 | xargs -0 -n1 -P4 python3 -m mdformat --check --wrap 120
+        run: find . -name '*.md' ! -name 'CHANGELOG.md' -type f -print0 | xargs -0 uvx --with linkify-it-py --with mdformat-config --with mdformat-gfm --with mdformat-shfmt --with mdformat-tables --with mdformat-toc mdformat --check --wrap 120
 
       - name: run shfmt
         run: find . -name '*.sh' -type f -print0 | xargs -0 -n1 -P4 shfmt -bn -ci -d -i 2 -ln bash -s -sr
