@@ -28,7 +28,7 @@ jobs:
         run: git fetch origin ${{ github.event.pull_request.base.ref }} --depth 1
 
       - name: Install commitlint
-        run: npm install commitlint
+        run: npm install --global commitlint
 
       - name: Write custom commitlint config
         run: |
