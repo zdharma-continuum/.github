@@ -95,7 +95,7 @@ jobs:
         if: always()
         run: |
           set +e
-          COMMIT_OUTPUT=$(commitlint --from=origin/${{ github.event.pull_request.base.ref }} --to=${{ github.event.pull_request.head.sha }} --color=false --verbose)
+          COMMIT_OUTPUT=$(npx --yes commitlint --from=origin/${{ github.event.pull_request.base.ref }} --to=${{ github.event.pull_request.head.sha }} --color=false --verbose)
           STATUS=$?
           set -e
 
