@@ -28,7 +28,7 @@ jobs:
         run: git fetch origin ${{ github.event.pull_request.base.ref }} --depth 1
 
       - name: Install commitlint
-        run: npm install --global commitlint
+        run: npm install --global @commitlint/config-conventional @commitlint/cli
 
       - name: Write custom commitlint config
         run: |
@@ -73,7 +73,7 @@ jobs:
         run: |
           set +e
           PR_TITLE="${{ github.event.pull_request.title }}"
-          TITLE_OUTPUT=$(echo "$PR_TITLE" | commitlint --color=false)
+          TITLE_OUTPUT=$(echo "$PR_TITLE" | commitlint -x @commitlint/config-conventional --color=false)
           STATUS=$?
           set -e
 
@@ -95,7 +95,7 @@ jobs:
         if: always()
         run: |
           set +e
-          COMMIT_OUTPUT=$(commitlint --from=origin/${{ github.event.pull_request.base.ref }} --to=${{ github.event.pull_request.head.sha }} --color=false --verbose)
+          COMMIT_OUTPUT=$(commitlint -x @commitlint/config-conventional --from=origin/${{ github.event.pull_request.base.ref }} --to=${{ github.event.pull_request.head.sha }} --color=false --verbose)
           STATUS=$?
           set -e
 
