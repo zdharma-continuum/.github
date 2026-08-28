@@ -35,6 +35,7 @@ jobs:
           cat << 'EOF' > commitlint.config.js
             module.exports = {
               extends: ['@commitlint/config-conventional'],
+              defaultIgnores: true,
               plugins: [
                 {
                   rules: {
