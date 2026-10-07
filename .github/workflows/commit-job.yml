@@ -71,10 +71,11 @@ jobs:
       - name: Validate Pull Request Title
         id: lint_title
         if: always()
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           set +e
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          TITLE_OUTPUT=$(echo "$PR_TITLE" | commitlint -x @commitlint/config-conventional --color=false)
+          TITLE_OUTPUT=$(printf '%s\n' "$PR_TITLE" | commitlint -x @commitlint/config-conventional --color=false)
           STATUS=$?
           set -e
 
@@ -110,19 +111,18 @@ jobs:
             exit 1
           fi
 
-      - name: Post PR Checklist Comment
+      - name: Write Checklist to Job Summary
         if: failure() && (steps.lint_title.outcome == 'failure' || steps.lint_commits.outcome == 'failure')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ERROR_BLOCK=$(cat ./lint_errors.md)
-
-          COMMENT_BODY=$(cat << EOF
+          {
+          cat << 'EOF'
           ## Repository Formatting Guidelines Violation
 
           Your pull request validation failed due to structural issues in your PR title or git commit history. Verify the diagnostics below:
 
-          $ERROR_BLOCK
+          EOF
+          cat ./lint_errors.md
+          cat << 'EOF'
 
           ---
 
@@ -134,20 +134,13 @@ jobs:
           ### Remediation Guide
 
           How to rewrite your Pull Request Title:
-          Click the Edit button next to your PR title at the top of this dashboard page and apply standard structures:
+          Click the Edit button next to your PR title at the top of the pull request page and apply standard structures:
           > feat: add integration layer for authentication processing
 
           How to fix a broken commit message on your local machine:
-          \`\`\`bash
+          ```bash
           git commit --amend --message="<prefix>: <message>"
           git push origin HEAD --force-with-lease
-          \`\`\`
+          ```
           EOF
-          )
-
-          curl --silent \
-            --request POST \
-            --header "Authorization: token $GITHUB_TOKEN" \
-            --header "Accept: application/vnd.github.v3+json" \
-            "https://github.com{{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-            --data "$(jq --null-input --arg body "$COMMENT_BODY" '{body: $body}')"
+          } >> "$GITHUB_STEP_SUMMARY"
