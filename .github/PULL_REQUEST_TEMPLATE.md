@@ -26,3 +26,4 @@
 - [ ] All new and existing tests passed.
 - [ ] I have added tests to cover my changes.
 - [ ] I have updated the documentation accordingly.
+- [ ] My commit messages and the pull request title follow the [commit message rules](https://github.com/zdharma-continuum/.github/blob/main/CONTRIBUTING.md#commit-messages).
