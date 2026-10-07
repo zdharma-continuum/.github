@@ -1,0 +1,21 @@
+#!/bin/sh
+# Git pre-push hook for zdharma-continuum repositories. On each push it
+# downloads the current commit-message check (commitlint/pre-push in
+# zdharma-continuum/.github) and runs it on the commits being pushed.
+#
+# Install it in a clone with:
+#
+#   curl -fsSL https://raw.githubusercontent.com/zdharma-continuum/.github/main/commitlint/pre-push-hook \
+#     -o .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+#
+# `git push --no-verify` pushes without the check.
+
+base_url=${COMMITLINT_BASE_URL:-https://raw.githubusercontent.com/zdharma-continuum/.github/main/commitlint}
+
+script=$(mktemp) || exit 0
+trap 'rm -f "$script"' EXIT
+if ! curl -fsSL "$base_url/pre-push" -o "$script"; then
+  echo "commitlint: cannot download the check from $base_url; pushing without checking commit messages." >&2
+  exit 0
+fi
+sh "$script" "$@"
